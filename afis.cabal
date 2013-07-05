@@ -21,14 +21,7 @@ Library
                    , crypto-random-api
                    , packer
                    , byteable
-                   , bytedump
   Exposed-modules:   Crypto.Data.AFIS
-
---Executable           afis
---  Main-Is:           afis.hs
---  ghc-options:       -Wall -fno-warn-missing-signatures
---  Hs-Source-Dirs:    .
---  Build-depends:     base >= 4 && < 5
 
 Test-Suite test-afis
   type:              exitcode-stdio-1.0
@@ -45,7 +38,6 @@ Test-Suite test-afis
                    , crypto-random-api
                    , cryptohash
                    , bytestring
-                   , bytedump
   ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures
 
 source-repository head

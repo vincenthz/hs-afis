@@ -5,21 +5,17 @@ module Main where
 import Control.Applicative
 import Control.Monad
 
-import Test.Framework (Test, defaultMain, testGroup)
+import Test.Framework (defaultMain, testGroup)
 import Test.Framework.Providers.QuickCheck2 (testProperty)
 import Test.Framework.Providers.HUnit (testCase)
-import Test.HUnit
 
+import Test.HUnit
 import Test.QuickCheck
-import Test.QuickCheck.Test
-import Test.Framework.Providers.QuickCheck2 (testProperty)
 
 import qualified Crypto.Data.AFIS as AFIS
 import Crypto.Hash
 import Crypto.Random.API
 import qualified Data.ByteString as B
-
-import Text.Bytedump
 
 mergeVec =
     [ (3
@@ -34,7 +30,7 @@ mergeVec =
       )
     ]
 
-mergeKATs = map toProp $ zip mergeVec [0..]
+mergeKATs = map toProp $ zip mergeVec [(0 :: Int)..]
   where toProp ((nbExpands, hashF, expected, dat), i) =
             testCase ("merge " ++ show i) (expected @=? AFIS.merge hashF nbExpands dat)
 
@@ -67,14 +63,3 @@ assertEq b1 b2 | b1 /= b2  = error ("b1: " ++ show b1 ++ " b2: " ++ show b2)
                | otherwise = True
 
 main = defaultMain tests
-{-
-    let hf    = hash :: HashFunctionBS SHA1
-        e     = 4
-        bs    = B.pack [1,2,3,4,5,1,2]
-        (z,_) = AFIS.split hf (FakeRNG 0 $ B.replicate 4000 3) e bs
-        bs2   = AFIS.merge hf e z
-    when (bs /= bs2) $ do
-        putStrLn ("bs : " ++ dumpRawBS bs)
-        putStrLn ("z  : " ++ dumpRawBS z)
-        putStrLn ("bs2: " ++ dumpRawBS bs2)
--}
