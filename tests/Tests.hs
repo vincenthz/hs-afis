@@ -14,8 +14,9 @@ import Test.QuickCheck
 
 import qualified Crypto.Data.AFIS as AFIS
 import Crypto.Hash
-import Crypto.Random.API
+import Crypto.Random
 import qualified Data.ByteString as B
+import Data.Byteable
 
 mergeVec =
     [ (3
@@ -42,11 +43,13 @@ instance Show AFISParams where
 data FakeRNG = FakeRNG Int B.ByteString
 
 instance CPRG FakeRNG where
-    cprgNeedReseed _ = NeverReseed
-    cprgSupplyEntropy b2 (FakeRNG o b) = FakeRNG o (B.append b b2)
-    cprgGenBytes n (FakeRNG o b)
+    cprgCreate pool = FakeRNG 0 (toBytes $ grabEntropy 1024 pool)
+    cprgSetReseedThreshold _ g = g
+    cprgGenerate n (FakeRNG o b)
         | n > B.length b - o = (B.take n $ B.drop o (B.concat $ replicate 10 b), FakeRNG 0 b)
         | otherwise          = (B.take n $ B.drop o b, FakeRNG (o+n) b)
+    cprgGenerateWithEntropy = cprgGenerate
+    cprgFork g = (g,g)
 
 instance Arbitrary AFISParams where
     arbitrary = AFISParams <$> arbitraryBS <*> choose (2,2) <*> elements [hash :: HashFunctionBS SHA1] <*> arbitraryRandom

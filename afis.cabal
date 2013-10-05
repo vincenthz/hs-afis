@@ -17,8 +17,8 @@ data-files:          README.md
 Library
   Build-Depends:     base >= 3 && < 5
                    , bytestring
-                   , cryptohash
-                   , crypto-random-api
+                   , cryptohash >= 0.9.1
+                   , crypto-random
                    , packer
                    , byteable
   Exposed-modules:   Crypto.Data.AFIS
@@ -35,9 +35,10 @@ Test-Suite test-afis
                    , test-framework-quickcheck2
                    , test-framework-hunit
                    , afis
-                   , crypto-random-api
+                   , crypto-random
                    , cryptohash
                    , bytestring
+                   , byteable
   ghc-options:       -Wall -fno-warn-orphans -fno-warn-missing-signatures
 
 source-repository head

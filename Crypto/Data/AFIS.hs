@@ -79,7 +79,7 @@ split hashF rng expandTimes src
             xorMem blockPtr lastBlock blockSize
             diffuse hashF lastBlock blockSize
         fillRandomBlock g blockPtr = do
-            let (rand, g') = genRandomBytes blockSize g
+            let (rand, g') = cprgGenerate blockSize g
             withBytePtr rand $ \randPtr -> B.memcpy blockPtr randPtr blockSize
             return g'
 
@@ -132,10 +132,10 @@ diffuse hashF src sz = loop src 0
                                  return ()
                  | otherwise = return ()
 
-        digestSize = B.length $ digestToByteString $ hashF B.empty
+        digestSize = byteableLength $ hashF B.empty
 
         byteStringOfPtr :: Ptr Word8 -> Int -> IO ByteString
         byteStringOfPtr ptr sz = newForeignPtr_ ptr >>= \fptr -> return $ B.fromForeignPtr fptr 0 sz
 
         hashBlock n src =
-            digestToByteString $ hashF $ runPacking (B.length src+4) (putWord32BE (fromIntegral n) >> putBytes src)
+            toBytes $ hashF $ runPacking (B.length src+4) (putWord32BE (fromIntegral n) >> putBytes src)
