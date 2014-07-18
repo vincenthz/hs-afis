@@ -22,7 +22,6 @@ import Crypto.Random.API
 import Control.Monad (forM_, foldM)
 import Data.ByteString (ByteString)
 import Data.Byteable
-import Data.Packer
 import Data.Tuple
 import Data.Word
 import Data.Bits
@@ -138,4 +137,12 @@ diffuse hashF src sz = loop src 0
         byteStringOfPtr ptr sz = newForeignPtr_ ptr >>= \fptr -> return $ B.fromForeignPtr fptr 0 sz
 
         hashBlock n src =
-            toBytes $ hashF $ runPacking (B.length src+4) (putWord32BE (fromIntegral n) >> putBytes src)
+            toBytes $ hashF $ B.unsafeCreate (B.length src+4) $ \ptr -> do
+                poke ptr               (f8 (n `shiftR` 24))
+                poke (ptr `plusPtr` 1) (f8 (n `shiftR` 16))
+                poke (ptr `plusPtr` 2) (f8 (n `shiftR` 8))
+                poke (ptr `plusPtr` 3) (f8 n)
+                --putWord32BE (fromIntegral n) >> putBytes src)
+                withBytePtr src $ \srcPtr -> B.memcpy (ptr `plusPtr` 4) srcPtr (B.length src)
+          where f8 :: Int -> Word8
+                f8 = fromIntegral
